@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="nodeport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    canvas{
+        width: 750px;
+        height: 1334px;
+        border: 1px solid #000;
+        /* position: relative; */
+    }
+
+    </style>
+
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        /**该方法用来绘制一个有填充色的圆角矩形 
+     *@param cxt:canvas的上下文环境 
+     *@param x:左上角x轴坐标 
+     *@param y:左上角y轴坐标 
+     *@param width:矩形的宽度 
+     *@param height:矩形的高度 
+     *@param radius:圆的半径 
+     *@param fillColor:填充颜色 
+     **/
+    function fillRoundRect(cxt, x, y, width, height, radius, /*optional*/ fillColor) {
+        //圆的直径必然要小于矩形的宽高          
+        if (2 * radius > width || 2 * radius > height) { return false; }
+ 
+        cxt.save();
+        cxt.translate(x, y);
+        //绘制圆角矩形的各个边  
+        drawRoundRectPath(cxt, width, height, radius);
+        cxt.fillStyle = fillColor || "#000"; //若是给定了值就用给定的值否则给予默认值  
+        cxt.fill();
+        cxt.restore();
+    }
+ 
+ 
+    /**该方法用来绘制圆角矩形 
+     *@param cxt:canvas的上下文环境 
+     *@param x:左上角x轴坐标 
+     *@param y:左上角y轴坐标 
+     *@param width:矩形的宽度 
+     *@param height:矩形的高度 
+     *@param radius:圆的半径 
+     *@param lineWidth:线条粗细 
+     *@param strokeColor:线条颜色 
+     **/
+    function strokeRoundRect(cxt, x, y, width, height, radius, /*optional*/ lineWidth, /*optional*/ strokeColor) {
+        //圆的直径必然要小于矩形的宽高          
+        if (2 * radius > width || 2 * radius > height) { return false; }
+ 
+        cxt.save();
+        cxt.translate(x, y);
+        //绘制圆角矩形的各个边  
+        drawRoundRectPath(cxt, width, height, radius);
+        cxt.lineWidth = lineWidth || 2; //若是给定了值就用给定的值否则给予默认值2  
+        cxt.strokeStyle = strokeColor || "#000";
+        // cxt.stroke();
+        cxt.restore();
+    }
+
+    function drawText(context, t, x, y, w, lineHeight, opts) {
+
+        var chr = t.split("");
+        var temp = "";              
+        var row = [];
+
+        // context.font = "20px Arial";
+        context.fillStyle = "black";
+        // context.textBaseline = "middle";
+
+        for(var a = 0; a < chr.length; a++){
+
+            if( context.measureText(temp).width < w && context.measureText(temp+(chr[a])).width <= w){
+                temp += chr[a];
+            }//context.measureText(text).width  测量文本text的宽度
+            else{
+                row.push(temp);
+                temp = chr[a];
+            }
+        }
+        row.push(temp);
+
+        const { textAlign } = opts
+
+        for (var b = 0; b < row.length; b++){
+            // context.fillText(row[b],x,y+(b+1)*lineHeight)
+            context.textAlign = textAlign
+            if (textAlign === 'left') {
+                context.fillText(row[b], x, y + (b) * lineHeight)
+            } else {
+                // right
+                context.fillText(row[b], x + w, y + (b) * lineHeight)
+            }
+        }
+        return {
+            line: row.length,
+            height: row.length * lineHeight
+        }
+
+        // 只显示2行，加...
+        /*for(var b = 0; b < 2; b++){
+            var str = row[b];
+            if(b == 1){
+                str = str.substring(0,str.length-1) + '...';
+            }
+            context.fillText(str,x,y+(b+1)*24);
+        }*/
+    }
+
+    function calText(context, t, x, y, w, lineHeight) {
+
+        var chr = t.split("");
+        var temp = "";              
+        var row = [];
+
+        // context.font = "20px Arial";
+        context.fillStyle = "black";
+        // context.textBaseline = "middle";
+
+        for(var a = 0; a < chr.length; a++){
+
+            if( context.measureText(temp).width < w && context.measureText(temp+(chr[a])).width <= w){
+                temp += chr[a];
+            }//context.measureText(text).width  测量文本text的宽度
+            else{
+                row.push(temp);
+                temp = chr[a];
+            }
+        }
+        row.push(temp);
+
+        for (var b = 0; b < row.length; b++){
+            // context.fillText(row[b],x,y+(b+1)*lineHeight)
+            context.fillText(row[b], x, y + (b) * lineHeight)
+        }
+        return {
+            line: row.length,
+            height: row.length * lineHeight
+        }
+    }
+ 
+    function drawRoundRectPath(cxt, width, height, radius) {
+        cxt.beginPath(0);
+        //从右下角顺时针绘制，弧度从0到1/2PI  
+        cxt.arc(width - radius, height - radius, radius, 0, Math.PI / 2);
+ 
+        //矩形下边线  
+        cxt.lineTo(radius, height);
+ 
+        //左下角圆弧，弧度从1/2PI到PI  
+        cxt.arc(radius, height - radius, radius, Math.PI / 2, Math.PI);
+ 
+        //矩形左边线  
+        cxt.lineTo(0, radius);
+ 
+        //左上角圆弧，弧度从PI到3/2PI  
+        cxt.arc(radius, radius, radius, Math.PI, Math.PI * 3 / 2);
+ 
+        //上边线  
+        cxt.lineTo(width - radius, 0);
+ 
+        //右上角圆弧  
+        cxt.arc(width - radius, radius, radius, Math.PI * 3 / 2, Math.PI * 2);
+ 
+        //右边线  
+        cxt.lineTo(width, height - radius);
+        cxt.closePath();
+    }
+
+    let canvas = document.getElementById('canvas')
+    let ctx = canvas.getContext('2d')
+
+    let root = {
+        x: 0,
+        y: 0,
+        width: 750,
+        heigth: 1334,
+        children: [
+            // 背景
+            {
+                // type: 'rect',
+                x: 0,
+                y: 0,
+                width: 750,
+                height: 1334,
+                color: 'rgba(241,240,240,1)',
+            },
+            
+            // 右下角
+            {
+                type: 'image',
+                x: 0,
+                y: 1183,
+                width: 118,
+                height: 118,
+                url: '/bg.png',
+            },
+            // 内容
+            {
+                x: 32,
+                y: 34,
+                width: 686,
+                height: 1264,
+                color: '#fff',
+                borderRadius: 8,
+            },
+            // 虚线
+            {
+                type: 'line',
+                x: 52,
+                y: 439,
+                x2: 52 + 647,
+                y2: 439,
+                color: '#979797',
+                lineStyle: 'dashed',
+            },
+            // header
+            {
+                x: 32,
+                y: 34,
+                width: 686,
+                height: 405,
+                // strong: '#09c',
+                children: [
+                    // 左边的圆
+                    {
+                        relative: 'parent',
+                        left: -15,
+                        bottom: -15,
+                        width: 30,
+                        height: 30,
+                        color: '#09c',
+                        borderRadius: 15,
+        //                 css: `
+        //                 width: 30px;
+        // height: 30px;
+        // background: rgb(241, 240, 240);
+        // border-radius: 50%;`
+                    },
+                    {
+                        relative: 'parent',
+                        right: -15,
+                        bottom: -15,
+                        width: 30,
+                        height: 30,
+                        color: '#09c',
+                        borderRadius: 15,
+                    },
+                ],
+            },
+            // 头像
+            {
+                type: 'image',
+                x: 53,
+                y: 104,
+                width: 118,
+                height: 118,
+                url: 'http://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLhsTNItLGOuSMAwvG0RrFpvNuhXe4psAcnZk9djU6VA2z68f4pKgOJu1ibZibgk5wGCq6g9dDsmTQw/132',
+            },
+            // info
+            {
+                x: 177,
+                y: 103,
+                width: 520,
+                height: 118,
+                color: '#FFE6DC',
+                borderRadius: 20,
+            },
+            {
+                type: 'text',
+                text: '你敢立下这个flag吗？',
+                x: 242,
+                y: 128,
+                width: 412,
+                color: '#FF5138',
+                borderRadius: 20,
+                fontSize: 42,
+                lineHeight: 59,
+            },
+            {
+                type: 'text',
+                text: '咕咚智能心率耳机Quiet体验：耳机除了听歌原来还能这样玩！',
+                x: 93,
+                y: 486,
+                width: 610,
+                height: 118,
+                color: '#000000',
+                borderRadius: 20,
+                fontSize: 50,
+                lineHeight: 84,
+                marginBottom: 63,
+            },
+            // 挑战标题
+            {
+                position: 'static',
+                x: 93,
+                width: 154,
+                height: 50,
+                borderRadius: 20,
+                fontSize: 50,
+                lineHeight: 84,
+                marginBottom: 32,
+                // strong: '#f00',
+                children: [
+                    {
+                        type: 'text',
+                        text: '挑战内容',
+                        width: 285,
+                        color: 'rgba(0, 0, 0, 0.85)',
+                        fontSize: 36,
+                        lineHeight: 84,
+                        fontWeight: 'bold',
+                    },
+                    {
+                        relative: 'parent',
+                        left: 0,
+                        bottom: 0,
+                        width: 154,
+                        height: 15,
+                        color: 'rgba(249, 138, 95, 1)',
+                    },
+                ],
+            },
+            // 挑战列表
+            {
+                position: 'static',
+                x: 93,
+                width: 154,
+                height: 350,
+                // color: '#f00',
+                borderRadius: 20,
+                fontSize: 50,
+                lineHeight: 84,
+                marginBottom: 32,
+                children: ['坚持10天读完一本书', '坚持写读书笔记'].map(item => {
+                    return {
+                        width: 300,
+                        height: 42,
+                        marginBottom: 18,
+                        // strong: '#09c',
+                        layout: 'x',
+                        // yAlign: 'center',
+                        children: [
+                            {
+                                width: 10,
+                                height: 10,
+                                borderRadius: 5,
+                                marginRight: 20,
+                                color: '#f00',
+                            },
+                            {
+                                type: 'text',
+                                text: item,
+                                width: 285,
+                                color: 'rgba(0, 0, 0, 0.65)',
+                                fontSize: 30,
+                                lineHeight: 84,
+                            },
+                        ]
+                    }
+                })
+            },
+            // 标题框 left
+            {
+                x: 53,
+                y: 475,
+                width: 8,
+                height: 37,
+                color: '#000000',
+            },
+            {
+                x: 0,
+                y: 0,
+                width: 100,
+                height: 100,
+                border: {
+                    color: '#09c'
+                }
+                // color: '#396',
+            },
+            // footer
+            // {
+            //     x: 32,
+            //     y: 1159,
+            //     width: 686,
+            //     height: 102,
+            //     border: {
+            //         color: '#f00'
+            //     },
+            //     children: [
+            //         // 二维码
+            //         {
+            //             type: 'image',
+            //             relative: 'parent',
+            //             top: 0,
+            //             right: 46,
+            //             width: 102,
+            //             height: 102,
+            //             url: '/qrcode.png',
+            //         },
+            //         {
+            //             type: 'text',
+            //             relative: 'parent',
+            //             text: '长按识别小程序码',
+            //             top: 21,
+            //             right: 170,
+            //             width: 610,
+            //             borderRadius: 20,
+            //             fontSize: 24,
+            //             lineHeight: 33,
+            //             textAlign: 'right',
+            //             color: 'rgba(0, 0, 0, 0.45)',
+            //         },
+            //         {
+            //             type: 'text',
+            //             relative: 'parent',
+            //             text: '立下我的flag',
+            //             top: 68,
+            //             right: 170,
+            //             width: 610,
+            //             borderRadius: 20,
+            //             fontSize: 24,
+            //             lineHeight: 33,
+            //             textAlign: 'right',
+            //             color: 'rgba(0, 0, 0, 0.45)',
+            //         },
+            //     ]
+            // },
+            
+        ]
+    }
+
+    // root = {
+    //     x: 0,
+    //     y: 0,
+    //     width: 750,
+    //     heigth: 1334,
+    //     children: [
+    //         {
+    //             x: 24,
+    //             y: 24,
+    //             width: 750,
+    //             height: 750,
+    //             color: '#999',
+    //             children: [
+    //                 {
+    //                     type: 'text',
+    //                     text: '坚持10天读完一本书',
+    //                     width: 285,
+    //                     color: '#c90',
+    //                     fontSize: 50,
+    //                     lineHeight: 84,
+    //                     marginBottom: 32,
+    //                 },
+    //                 {
+    //                     position: 'static',
+    //                     type: 'text',
+    //                     text: '坚持写读书笔记',
+    //                     width: 285,
+    //                     color: '#c90',
+    //                     fontSize: 50,
+    //                     lineHeight: 84,
+    //                     marginBottom: 32,
+    //                 },
+    //             ]
+    //         },
+    //     ]
+    // }
+
+    // 预处理
+    function preProcess(node, parent, lastChild) {
+        console.log('预处理', node, parent)
+        const {
+            type = 'node',
+            color = '#999',
+            x,
+            y,
+            width = 0,
+            height = 0,
+            borderRadius = 0,
+            marginBottom = 0,
+            marginRight = 0,
+        } = node
+
+        node._width = width
+        node._height = height
+        node._marginBottom = marginBottom
+        node._marginRight = marginRight
+
+        // 文字处理
+        if (node.type === 'text') {
+            ctx.font = `${node.fontSize}px Georgia`
+            let { line, height } = calText(ctx, node.text, 0, 0, node.width, node.lineHeight)
+            // if (line)
+            node._line = line
+            node._height = height
+
+            node._fontWeight = node.fontWeight
+        }
+
+        node._x = x
+        node._y = y
+        if (x === undefined) {
+            node._x = parent ? parent._x : 0
+        }
+        if (y === undefined) {
+            if (lastChild) {
+                node._y = lastChild._y + lastChild._height + lastChild._marginBottom
+            } else {
+                node._y = parent ? parent._y : 0
+            }
+        }
+
+        if (parent && parent.layout === 'x') {
+            if (parent.yAlign === 'center') {
+                node._y = parent._y + parent._height / 2 - node._height / 2
+            } else {
+                node._y = parent._y
+            }
+            if (lastChild) {
+                node._x = lastChild._x + lastChild._width 
+                node._x = lastChild._x + lastChild._width + lastChild._marginRight
+            } else {
+                node._x = parent ? parent._x : 0
+            }
+        }
+
+        
+
+        if (node.css) {
+            let css = node.css
+            // console.log('css', css)
+            let arr = css.split('\n').map(item => item.replace(/^\s+/, '').replace(/\s+$/, '').replace(/;/, '')).filter(item => item)
+            for (let item of arr) {
+                // console.log('item', item)
+                let kv = item.split(':')
+                let key = kv[0].replace(/^\s+/, '').replace(/\s+$/, '')
+                let value = kv[1].replace(/^\s+/, '').replace(/\s+$/, '')
+                // console.log('key & value', key, value)
+                if (key === 'width') {
+                    node.width = value.replace('px', '')
+                }
+                if (key === 'height') {
+                    node.height = value.replace('px', '')
+                }
+            }
+        }
+        
+        // 文字计算行、高度
+        // 流式布局
+        if (node.position === 'static') {
+            if (lastChild) { // TODO
+                node._y = lastChild._y + lastChild._height + lastChild._marginBottom
+                console.log('计算', node._y)
+            }
+        }
+        // 相对布局
+        if (node.relative === 'parent' && parent) {
+            // node._x = parent._x + parent._width
+            // node._y = parent._y + node._y
+            if (node.right) {
+                node._x = parent._x + parent._width - node._width - node.right
+            } else {
+                node._x = parent._x + node.left
+            }
+            if (node.top) {
+                node._y = parent._y + node.top
+            } else {
+                node._y = parent._y + parent._height - node._height - node.bottom
+            }
+        }
+
+        if (node.children && node.children.length) {
+            let children = node.children
+            let lastChild = null
+            for (let idx = 0; idx < children.length; idx++) {
+                let child = node.children[idx]
+                lastChild = preProcess(child, node, lastChild)
+            }
+        }
+
+        return node
+    }
+
+    let startTime = new Date().getTime()
+
+    preProcess(root, null)
+
+    console.log('预处理后', root)
+    console.log('预处理后 children', root.children[0].children)
+    
+    let canvasWidth = root.width
+    let canvasHeight = root.heigth
+    canvas.width = canvasWidth
+    canvas.height = canvasHeight
+    // canvas.setAttribute('width', '' + canvasWidth)
+    // canvas.setAttribute('heigth', '' + canvasHeight)
+    ctx.width = canvasWidth
+    ctx.height = canvasHeight
+    
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight)
+
+    async function drawNode(node) {
+        const {
+            type = 'view',
+            color,
+            x = 0,
+            y = 0,
+            width = 0,
+            height = 0,
+            borderRadius = 0,
+
+            _x,
+            _y,
+            _width,
+            _height,
+        } = node
+
+        let drawOutline = false
+
+        if (type === 'view') {
+            ctx.beginPath()
+            ctx.fillStyle = color
+            if (borderRadius) {
+                strokeRoundRect(ctx, _x, _y, _width, _height, borderRadius)
+            } else {
+                ctx.rect(_x, _y, _width, _height)
+            }
+            if (color) {
+                ctx.fill()
+            } else {
+                drawOutline = true
+            }
+            if (node.border) {
+                ctx.beginPath()
+                ctx.setLineDash([])
+                ctx.rect(_x, _y, _width, _height)
+                ctx.strokeStyle = node.border.color
+                ctx.stroke()
+            }
+        }
+        if (type === 'line') {
+            if (node.lineStyle === 'dashed') {
+                ctx.setLineDash([8, 8])
+            } else {
+                ctx.setLineDash([])
+            }
+            // ctx.setLineDash([8, 8])
+            ctx.beginPath()
+            ctx.moveTo(node.x, node.y)
+            ctx.lineTo(node.x2, node.y2)
+            ctx.stroke()
+            
+        }
+        if (type === 'image') {
+            function getImage(url) {
+                return new Promise((resolve, reject) => {
+                    let img = new Image()
+                    img.onload = () => {
+                        resolve(img)
+                    }
+                    img.src = node.url
+                })
+            }
+            let img = await getImage(node.url)
+            
+            ctx.drawImage(img, 0, 0, img.width, img.height, _x, _y, _width, _height)
+
+            drawOutline = true
+
+            // ctx.beginPath()
+            // ctx.setLineDash([8, 8])
+            // ctx.rect(_x, y, width, height)
+            // ctx.stroke()
+        }
+        if (type === 'text') {
+            const {
+                fontSize = 12,
+                lineHeight,
+                textAlign = 'left',
+            } = node
+
+            
+
+            let drawLineHeight = lineHeight || (fontSize * 1.6)
+            // let height = lineHeight
+
+            let fontWeight = node._fontWeight === 'bold' ? node._fontWeight : ''
+
+            ctx.beginPath()
+            ctx.fillStyle = color
+            ctx.font = `${fontSize}px Georgia ${fontWeight}`
+            ctx.textBaseline = 'top'
+            // ctx.fontSize = (node.fontSize || 12) + 'px'
+            // ctx.fillText(node.text, x, y)
+
+            // if (textAlign === 'left') {}
+            const { line, height } = drawText(ctx, node.text, _x, _y, _width, drawLineHeight, {
+                textAlign
+            })
+
+            ctx.beginPath()
+            ctx.setLineDash([8, 8])
+            ctx.rect(_x, _y, _width, _height)
+            ctx.stroke()
+        }
+        
+        if (node.children && node.children.length) {
+            for (let child of node.children) {
+                drawNode(child)
+            }
+        }
+
+        if (drawOutline) {
+            ctx.strokeStyle = '#999'
+            ctx.lineWidth = 1
+            ctx.beginPath()
+            ctx.setLineDash([8, 8])
+            ctx.rect(_x, _y, _width, _height)
+            ctx.stroke()
+        }
+        if (node.strong) {
+            ctx.beginPath()
+            ctx.strokeStyle = node.strong
+            ctx.lineWidth = 8
+            ctx.setLineDash([])
+            ctx.rect(_x, _y, _width, _height)
+            ctx.stroke()
+        }
+
+        // ctx.beginPath()
+        // ctx.fillStyle = '#f00'
+        // ctx.fillRect(32, 32, 100, 100)
+    }
+
+    drawNode(root)
+
+    let time = new Date().getTime() - startTime
+    console.log(`耗时：${time}ms`)
+
+</script>
+</body>
+
+</html>
