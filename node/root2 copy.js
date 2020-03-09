@@ -20,7 +20,7 @@ const root2 = {
             // y: 0,
             width: '100%',
             height: '100%',
-            url: 'http://localhost:8082/mark_bg.jpg',
+            url: '/mark_bg.jpg',
         },
         {
             name: 'mask',
@@ -35,6 +35,37 @@ const root2 = {
                 from: 'rgba(0, 0, 0, 0)',
                 to: 'rgba(0, 0, 0, 0.9)',
             }
+        },
+
+        {
+            type: 'line',
+            x: 52,
+            y: 439,
+            x2: 52 + 647,
+            y2: 439,
+            color: '#979797',
+            lineStyle: 'dashed',
+        },
+        // 右下角
+        {
+            relative: 'parent',
+            bottom: 0,
+            left: 0,
+            type: 'image',
+            width: 118,
+            height: 118,
+            url: '/bg.png',
+        },
+        // .content
+        // 虚线
+        {
+            type: 'line',
+            x: 52,
+            y: 439,
+            x2: 52 + 647,
+            y2: 439,
+            color: '#979797',
+            lineStyle: 'dashed',
         },
         {
             name: 'footer',
@@ -81,7 +112,7 @@ const root2 = {
                     right: 32,
                     width: 142,
                     height: 142,
-                    url: 'http://localhost:8082/qrcode.png',
+                    url: '/qrcode.png',
                 },
             ]
         },
@@ -225,7 +256,7 @@ const root2 = {
             y: 99,
             width: 118,
             height: 118,
-            url: 'http://localhost:8082/avatar.jpg',
+            url: '/avatar.jpg',
             borderRadius: '50%'
         },
         {
@@ -290,4 +321,6 @@ const root2 = {
     ]
 }
 
-window.root2 = root2
+module.exports = {
+    root2,
+}

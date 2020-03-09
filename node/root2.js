@@ -290,4 +290,6 @@ const root2 = {
     ]
 }
 
-window.root2 = root2
+module.exports = {
+    root2,
+}

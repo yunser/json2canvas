@@ -37,6 +37,14 @@
                 width: '100%',
                 height: 290,
                 children: [
+                    // {
+                    //     relative: 'root', // 支持这种语法
+                    //     top: 20,
+                    //     left: 20,
+                    //     width: 100,
+                    //     height: 100,
+                    //     color: '#f00',
+                    // },
                     {
                         relative: 'parent',
                         top: 60,

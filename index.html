@@ -45,9 +45,9 @@
             width
         }
     </canvas> -->
+    <canvas class="canvas canvas2" id="canvas2"></canvas>
     <canvas class="canvas canvas0" id="canvas0"></canvas>
     <canvas class="canvas canvas1" id="canvas1"></canvas>
-    <canvas class="canvas canvas2" id="canvas2"></canvas>
     <canvas class="canvas canvas3" id="canvas3"></canvas>
     <canvas class="canvas canvas4" id="canvas4"></canvas>
 </div>
@@ -62,24 +62,28 @@
 <script>
     const { CanvasX } = window
 
+    let options = {
+        // debug: true,
+    }
+
     // 第零张
-    let canvas0 = new CanvasX('canvas0')
+    let canvas0 = new CanvasX('canvas0', options)
     canvas0.render(window.root0)
 
     // 第一张
-    let canvas = new CanvasX('canvas1')
+    let canvas = new CanvasX('canvas1', options)
     canvas.render(window.root)
 
     // 第二张
-    let canvas2 = new CanvasX('canvas2')
+    let canvas2 = new CanvasX('canvas2', options)
     canvas2.render(window.root2)
 
     // 第三张
-    let canvas3 = new CanvasX('canvas3')
+    let canvas3 = new CanvasX('canvas3', options)
     canvas3.render(window.root3)
 
     // 第四张
-    let canvas4 = new CanvasX('canvas4')
+    let canvas4 = new CanvasX('canvas4', options)
     canvas4.render(window.root4)
 
 </script>

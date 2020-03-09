@@ -1,6 +1,16 @@
 
 
 (function () {
+    function getImage(url) {
+        return new Promise((resolve, reject) => {
+            let img = new Image()
+            img.onload = () => {
+                resolve(img)
+            }
+            img.src = url
+        })
+    }
+
     /**该方法用来绘制一个有填充色的圆角矩形
          *@param cxt:canvas的上下文环境
         *@param x:左上角x轴坐标
@@ -138,8 +148,8 @@
             context.fillText(row[b], x, y + (b) * lineHeight)
         }
         return {
-            line: row.length,
-            height: row.length * lineHeight,
+            textLine: row.length,
+            textHeight: row.length * lineHeight,
             oneLineWidth,
             oneLineHeight: opts.textSize,
         }
@@ -200,11 +210,13 @@
 
     class CanvasX {
 
-        constructor(id) {
+        constructor(id, opts = {}) {
             this.elemId = id
+            this.debug = !!opts.debug
         }
 
         render(root) {
+            let _this = this
             let canvas = document.getElementById(this.elemId)
             let ctx = canvas.getContext('2d')
 
@@ -359,13 +371,13 @@
                     // TODO
 
                     ctx.font = `${node.textSize}px Georgia`
-                    let { line, height, oneLineWidth, oneLineHeight } = calText(ctx, node.text, 0, 0, width, node._lineHeight, node, {
+                    let { textLine, textHeight, oneLineWidth, oneLineHeight } = calText(ctx, node.text, 0, 0, node._width, node._lineHeight, node, {
                         textSize
                     })
                     // if (line)
-                    console.log('字体计算', node.text, line, height)
-                    node._line = line
-                    node._height = height
+                    console.log('字体计算', node.text, textLine, textHeight)
+                    node._textLine = textLine
+                    node._height = textHeight
                     if (width === 'auto') {
                         node._width = oneLineWidth + 4 // TODO hack +4 不加会换行，需要解决，否则有几个像素差
                     }
@@ -548,20 +560,14 @@
                 const {
                     type = 'view',
                     color,
-                    x = 0,
-                    y = 0,
-                    width = 0,
-                    height = 0,
                     borderRadius = 0,
 
                     _x,
                     _y,
                     _width,
                     _height,
-                    _innerWidth,
                     _innerHeight,
                     _padding,
-                    _margin,
                     _visible,
                 } = node
 
@@ -627,15 +633,7 @@
                     }
                     if (type === 'image') {
                         // console.log('画 image', node)
-                        function getImage(url) {
-                            return new Promise((resolve, reject) => {
-                                let img = new Image()
-                                img.onload = () => {
-                                    resolve(img)
-                                }
-                                img.src = node.url
-                            })
-                        }
+                        
                         let img = await getImage(node.url)
                         // console.log('获得图片，卡斯话', img)
                         if (node._borderRadius) {
@@ -680,8 +678,7 @@
                     }
                 }
 
-
-                if (drawOutline) {
+                if (_this.debug) {
                     ctx.strokeStyle = '#999'
                     ctx.lineWidth = 1
                     ctx.beginPath()
@@ -793,5 +790,3 @@
     }
     window.CanvasX = CanvasX
 })()
-
-

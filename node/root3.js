@@ -128,4 +128,6 @@ const root3 = {
     ]
 }
 
-window.root3 = root3
+module.exports = {
+    root3,
+}
