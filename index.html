@@ -45,9 +45,9 @@
             width
         }
     </canvas> -->
+    <canvas class="canvas canvas1" id="canvas1"></canvas>
     <canvas class="canvas canvas2" id="canvas2"></canvas>
     <canvas class="canvas canvas0" id="canvas0"></canvas>
-    <canvas class="canvas canvas1" id="canvas1"></canvas>
     <canvas class="canvas canvas3" id="canvas3"></canvas>
     <canvas class="canvas canvas4" id="canvas4"></canvas>
 </div>
@@ -55,7 +55,7 @@
 
 <script src="./canvas.js"></script>
 <script src='/root0.js'></script>
-<script src='/root.js'></script>
+<script src='/root1.js'></script>
 <script src='/root2.js'></script>
 <script src='/root3.js'></script>
 <script src='/root4.js'></script>
@@ -72,7 +72,7 @@
 
     // 第一张
     let canvas = new CanvasX('canvas1', options)
-    canvas.render(window.root)
+    canvas.render(window.root1)
 
     // 第二张
     let canvas2 = new CanvasX('canvas2', options)

@@ -216,6 +216,9 @@
         }
 
         render(root) {
+            if (!root) {
+                throw Error('root is empty')
+            }
             let _this = this
             let canvas = document.getElementById(this.elemId)
             let ctx = canvas.getContext('2d')
