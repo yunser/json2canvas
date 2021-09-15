@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "canvas": "^2.8.0",
+    "canvas-5-polyfill": "^0.1.5",
+    "color": "^4.0.1"
+  }
+}
